@@ -58,4 +58,4 @@ lavSpatialCorrect <- function(obj, xvar, yvar, alpha=0.05){
   
 }
 
-lavSpatialCorrect(obj, xvar, yvar)
+#lavSpatialCorrect(obj, xvar, yvar)

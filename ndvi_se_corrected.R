@@ -83,7 +83,7 @@ sqrt(diag(vcov(borFit)))
 #New SE
 ndvi.var <- diag(vcov(borFit))[1:3]
 
-ndvi.se <- sqrt(ndvi.err*nrow(boreal)/n.ndvi)
+ndvi.se <- sqrt(ndvi.var*nrow(boreal)/n.ndvi)
 
 ndvi.se
 
