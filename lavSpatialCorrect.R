@@ -19,10 +19,10 @@ lavSpatialCorrect <- function(obj, xvar, yvar, alpha=0.05){
   morans_i <- lapply(resids,  function(x){
     mi <- Moran.I(x, distsInv)
     if(mi$p.value>alpha){
-      mi$n <- nrow(resids) #don't correct sample size
+      mi$n.eff <- nrow(resids) #don't correct sample size
     }else{
       #large sample size approximation
-      mi$n <- nrow(resids)*(1-mi$observed)/(1+mi$observed)
+      mi$n.eff <- nrow(resids)*(1-mi$observed)/(1+mi$observed)
     }
     
     #return the list
@@ -33,21 +33,29 @@ lavSpatialCorrect <- function(obj, xvar, yvar, alpha=0.05){
   
   #get the vcov matrix
   v <- diag(vcov(obj))
-  
+  n <- nrow(resids)
   #using new sample sizes, for each variable, calculate new Z-scores
-  lapply(names(morans_i), function(acol){
+  params <- lapply(names(morans_i), function(acol){
     idx <- grep(paste0(acol, "~"),names(v))  #regression or covariances
     idx <- c(idx, grep(paste0("=~",acol),names(v)))  #latent variable definitions
-    v_idx <- v[idx]
+    v_idx <- v[idx]*n/morans_i[[acol]]$n.eff
     ret <-  data.frame(Parameter = names(v)[idx], Estimate=coef(obj)[idx], 
-                       n.eff = morans_i[[acol]]$n, Std.err = sqrt(v_idx))
+                       n.eff = morans_i[[acol]]$n.eff, Std.err = sqrt(v_idx))
     ret[["Z-value"]] <- ret$Estimate/ret$Std.err
     ret[["P(>|z|)"]] <- 2*pnorm(abs(ret[["Z-value"]]), lower.tail=F)
   
     ret
     
   })
+  names(params) <- names(morans_i)
 
-  
+  mi <- lapply(morans_i, function(m) {
+         data.frame(observed=m$observed, expected=m$expected, 
+                    sd=m$sd, p.value = m$p.value, n.eff = m$n.eff)
+  })
+
+ return(list(Morans_I = mi, parameters=params)) 
   
 }
+
+lavSpatialCorrect(obj, xvar, yvar)

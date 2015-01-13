@@ -15,7 +15,7 @@
 # Zuur, Ieno, Walker, Saveliev and Smith. Springer
 boreal <- read.table("./Boreality.txt", header=T)
 
-## @knitr visualize
+## @knitr visualize-data
 #Let's look at the spatial structure
 library(ggplot2)
 
@@ -43,14 +43,13 @@ borFit <- sem(borModel, data=boreal, meanstructure=T)
 # residuals are key for the analysis
 borRes <- as.data.frame(residuals(borFit, "casewise"))
 
-
-
-## @knitr residual-analysis
 #raw visualization of NDVI residuals
 qplot(x, y, data=boreal, color=borRes$NDVI, size=I(5)) +
   theme_bw(base_size=17) + 
   scale_color_gradient("NDVI Residual", low="blue", high="yellow")
 
+## @knitr residual-analysis-sign
+#raw visualization of sign of residuals
 qplot(x, y, data=boreal, color=borRes$NDVI>0, size=I(5)) +
   theme_bw(base_size=17) + 
   scale_color_manual("NDVI Residual >0", values=c("blue", "red"))
