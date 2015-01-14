@@ -1,0 +1,43 @@
+---
+title: "Readme"
+author: "Jarrett Byrnes"
+date: "January 13, 2015"
+output: md_document
+---
+```{r echo=FALSE}
+library(knitr)
+read_chunk("./ndvi_se_corrected.R")
+```
+
+**Correcting Standard Errors in SEMs fit with Covariance Matrices and ML using Moran's I**
+
+This code addresses the problem of correcting sample sizes and standard errors in the presence of spatial autocorrelation in Structural Equation Models with with spatial structure in the autocorrelation of endogenous variables. Two file are included. The first, ndvi_se_corrected.R, walks through the steps to calculate corrections piece by piece. You can see a longer explanation at http://www.imachordata.com/?p=1714
+
+The second is a function that impelements the correction for all endogenous variables, using Moran's I and an approximation of an effective sample size for large sample sizes.
+
+For an example, consuder the Boreal Vegetation dataset from Zuur et al.'s [Mixed Effects Models and Extensions in Ecology with R](http://www.highstat.com/book2.htm). The data shows vegetation NDVI from satellite data, as well as a number of other covariates - information on climate (days where the temperature passed some threshold, I believe), wetness, and species richness. And space. Here's what the data look like, for example:
+
+```{r load-data}
+```
+```{r visualize-data}
+```
+
+We can fit a model using [lavaan](http://lavaan.org) where NDVI is affected by species richness (nTot), wetness (Wet), and  climate (T61)  and richness is itself also affected by climate.
+```{r sem-model, warning=FALSE}
+```
+
+However, the residuals show autocorrelation. One way to see this  is just to look at the spatial pattern of the signs of residuals.
+```{r residuals}
+```
+
+```{r residual-analysis-sign}
+```
+
+lavSpatialCorrect calculates Moran's I for the residuals of all endogenous variables, and then spatially corrects them via Moran's I. If they are spatially independent, the effective sample size = the true sample size.
+
+
+```{r}
+
+lavSpatialCorrect(borFit, boreal$x, boreal$y)
+
+```

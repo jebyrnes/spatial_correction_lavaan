@@ -15,6 +15,10 @@
 # Zuur, Ieno, Walker, Saveliev and Smith. Springer
 boreal <- read.table("./Boreality.txt", header=T)
 
+#For later
+source("./lavSpatialCorrect.R")
+
+
 ## @knitr visualize-data
 #Let's look at the spatial structure
 library(ggplot2)
