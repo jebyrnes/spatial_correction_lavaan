@@ -17,7 +17,7 @@ boreal <- read.table("./Boreality.txt", header=T)
 
 #For later
 source("./lavSpatialCorrect.R")
-
+source("./predict_lavaan.R") #prediction by regression functions
 
 ## @knitr visualize-data
 #Let's look at the spatial structure
@@ -45,8 +45,7 @@ borFit <- sem(borModel, data=boreal, meanstructure=T)
 
 ## @knitr residuals
 # residuals are key for the analysis
-borRes <- as.data.frame(residuals(borFit, "casewise"))
-
+borRes <- as.data.frame(residuals_lavaan(borFit))
 #raw visualization of NDVI residuals
 qplot(x, y, data=boreal, color=borRes$NDVI, size=I(5)) +
   theme_bw(base_size=17) + 
@@ -72,7 +71,7 @@ diag(distsInv) <- 0
 
 ## @knitr moran_i_ndvi
 #calculate Moran's I just for NDVI
-mi.ndvi <- Moran.I(borRes$NDVI, distsInv)
+mi.ndvi <- Moran.I(c(borRes$NDVI), as.matrix(distsInv))
 mi.ndvi
 
 ## @knitr spatial_corrected_sample
@@ -102,5 +101,6 @@ z <- coef(borFit)[1:3]/ndvi.se
 
 2*pnorm(abs(z), lower.tail=F)
 
-
-summary(borFit, standardized=T)
+#compare with lavSpatialCorrect function
+spat_cor<-lavSpatialCorrect(borFit, boreal$x, boreal$y)
+spat_cor$parameters$NDVI[,c(5,6)]
