@@ -6,7 +6,7 @@ lavSpatialCorrect <- function(obj, xvar, yvar, alpha=0.05){
   
   # first, get the residuals from the model
   resids <- lavResidualsY(obj)
-  
+
   # get only endogenous variables
   # no longer need
   #resids <- resids[,which(apply(resids, 2, function(x) length(unique(x))) !=1)]
@@ -20,7 +20,7 @@ lavSpatialCorrect <- function(obj, xvar, yvar, alpha=0.05){
   diag(distsInv) <- 0
   
   morans_i <- lapply(resids,  function(x){
-    mi <- Moran.I(x, distsInv)
+    mi <- Moran.I(c(x), distsInv)
     if(mi$p.value>alpha){
       mi$n.eff <- nrow(resids) #don't correct sample size
     }else{

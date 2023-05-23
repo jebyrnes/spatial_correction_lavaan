@@ -73,7 +73,7 @@ diag(distsInv) <- 0
 
 ## @knitr moran_i_ndvi
 #calculate Moran's I just for NDVI
-mi.ndvi <- Moran.I(borRes$NDVI, distsInv)
+mi.ndvi <- Moran.I(c(borRes$NDVI), as.matrix(distsInv))
 mi.ndvi
 
 ## @knitr spatial_corrected_sample
@@ -105,3 +105,7 @@ z <- coef(borFit)[1:3]/ndvi.se
 
 
 summary(borFit, standardized=T)
+
+#compare with lavSpatialCorrect function
+spat_cor<-lavSpatialCorrect(borFit, boreal$x, boreal$y)
+spat_cor$parameters$NDVI[,c(5,6)]
