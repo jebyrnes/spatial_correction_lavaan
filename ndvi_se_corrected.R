@@ -17,6 +17,7 @@ boreal <- read.table("./Boreality.txt", header=T)
 
 #For later
 source("./lavSpatialCorrect.R")
+source("./lavResidualsY.R")
 
 
 ## @knitr visualize-data
@@ -45,7 +46,7 @@ borFit <- sem(borModel, data=boreal, meanstructure=T)
 
 ## @knitr residuals
 # residuals are key for the analysis
-borRes <- as.data.frame(residuals(borFit, "casewise"))
+borRes <- lavResidualsY(borFit)
 
 #raw visualization of NDVI residuals
 qplot(x, y, data=boreal, color=borRes$NDVI, size=I(5)) +

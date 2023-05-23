@@ -1,18 +1,21 @@
+source("./lavResidualsY.R")
+
 lavSpatialCorrect <- function(obj, xvar, yvar, alpha=0.05){
   require(lavaan)
   require(ape)
   
-  #first, get the residuals from the model
-  resids <- as.data.frame(residuals(obj, "casewise"))
+  # first, get the residuals from the model
+  resids <- lavResidualsY(obj)
   
-  #get only endogenous variables
-  resids <- resids[,which(apply(resids, 2, function(x) length(unique(x))) !=1)]
+  # get only endogenous variables
+  # no longer need
+  #resids <- resids[,which(apply(resids, 2, function(x) length(unique(x))) !=1)]
   
 
-  #make a distance matrix
+  # make a distance matrix
   distMat <- as.matrix(dist(cbind(xvar, yvar)))
   
-  #invert this matrix for weights
+  # invert this matrix for weights
   distsInv <- 1/distMat
   diag(distsInv) <- 0
   
@@ -31,10 +34,10 @@ lavSpatialCorrect <- function(obj, xvar, yvar, alpha=0.05){
     })
   
   
-  #get the vcov matrix
+  # get the vcov matrix
   v <- diag(vcov(obj))
   n <- nrow(resids)
-  #using new sample sizes, for each variable, calculate new Z-scores
+  # using new sample sizes, for each variable, calculate new Z-scores
   params <- lapply(names(morans_i), function(acol){
     idx <- grep(paste0(acol, "~"),names(v))  #regression or covariances
     idx <- c(idx, grep(paste0("=~",acol),names(v)))  #latent variable definitions
